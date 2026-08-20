@@ -7,6 +7,7 @@ arguments — they travel over ``chpasswd``'s stdin only.
 
 from __future__ import annotations
 
+import os
 import subprocess
 
 USERADD = "/usr/sbin/useradd"
@@ -48,6 +49,12 @@ def user_exists(username: str) -> bool:
 
 def create_user(username: str, full_name: str) -> None:
     _run([USERADD, "-m", "-c", full_name, "-s", "/bin/bash", username])
+
+
+def restrict_home_directory(username: str) -> None:
+    """Lock the home directory down to owner-only access, matching the
+    hardening the previous manual creation script applied."""
+    os.chmod(f"/home/{username}", 0o700)
 
 
 def delete_user(username: str) -> None:

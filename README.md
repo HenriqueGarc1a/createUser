@@ -77,11 +77,12 @@ Fluxo (`helper/operations.py:create_user`):
 2. gera o username (`primeiro_nome_matricula`);
 3. verifica duplicidade de username **e** de matrícula;
 4. `useradd -m -c "<nome completo>" <username>`;
-5. define a senha inicial = matrícula, via stdin do `chpasswd` (nunca em argv);
-6. marca a senha como expirada (`chage -d 0`);
-7. adiciona os grupos extras permitidos (aditivamente, nunca substituindo a lista);
-8. valida que o usuário **não** recebeu nenhum grupo proibido;
-9. em caso de falha após a criação, tenta desfazer (`userdel`) — melhor esforço, não é uma transação real de banco de dados.
+5. restringe a pasta pessoal a `chmod 700` (acesso só pelo próprio dono);
+6. define a senha inicial = matrícula, via stdin do `chpasswd` (nunca em argv);
+7. marca a senha como expirada (`chage -d 0`);
+8. adiciona os grupos extras permitidos (aditivamente, nunca substituindo a lista);
+9. valida que o usuário **não** recebeu nenhum grupo proibido;
+10. em caso de falha após a criação, tenta desfazer (`userdel`) — melhor esforço, não é uma transação real de banco de dados.
 
 O administrador nunca digita a senha manualmente.
 

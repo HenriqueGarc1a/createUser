@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# ===== Verifica se está rodando como root =====
+if [[ "$EUID" -ne 0 ]]; then
+    echo "Este script precisa ser executado como root (use sudo)."
+    exit 1
+fi
+
+# ===== Verifica se grupo docker existe =====
+if ! getent group docker > /dev/null; then
+    echo "Grupo docker não encontrado. Docker está instalado?"
+    exit 1
+fi
+
+# ===== Função para ler senha com asteriscos =====
+ler_senha() {
+    local prompt="$1"
+    local char=""
+    SENHA_TEMP=""
+
+    echo -n "$prompt"
+
+    trap '' INT
+
+    while true; do
+        read -rsn1 char
+
+        if [[ -z "$char" ]]; then
+            break
+        fi
+
+        if [[ "$char" == $'\x7f' ]]; then
+            if [[ -n "$SENHA_TEMP" ]]; then
+                SENHA_TEMP="${SENHA_TEMP%?}"
+                echo -ne "\b \b"
+            fi
+        else
+            SENHA_TEMP+="$char"
+            echo -n "*"
+        fi
+    done
+
+    trap - INT
+    echo
+}
+
+# ===== Solicita matrícula =====
+read -p "Digite a matrícula do novo usuário: " MATRICULA
+
+if [[ -z "$MATRICULA" || ! "$MATRICULA" =~ ^[0-9]+$ ]]; then
+    echo "Matrícula inválida. Use apenas números."
+    exit 1
+fi
+
+USERNAME="u$MATRICULA"
+
+# ===== Verifica se usuário já existe =====
+if id "$USERNAME" &>/dev/null; then
+    echo "O usuário $USERNAME já existe."
+    exit 1
+fi
+
+# ===== Solicita senha =====
+ler_senha "Digite a senha para o usuário $USERNAME: "
+SENHA="$SENHA_TEMP"
+
+ler_senha "Confirme a senha: "
+SENHA_CONFIRMA="$SENHA_TEMP"
+
+if [[ -z "$SENHA" ]]; then
+    echo "A senha não pode ser vazia."
+    exit 1
+fi
+
+if [[ "$SENHA" != "$SENHA_CONFIRMA" ]]; then
+    echo "As senhas não coincidem."
+    exit 1
+fi
+
+# ===== Cria usuário =====
+adduser --disabled-password --gecos "" "$USERNAME"
+
+# ===== Define senha =====
+echo "$USERNAME:$SENHA" | chpasswd 2>/dev/null
+
+unset SENHA SENHA_CONFIRMA SENHA_TEMP
+
+# ===== Remove do grupo sudo (garantia extra) =====
+deluser "$USERNAME" sudo &>/dev/null
+
+# ===== Adiciona ao grupo docker =====
+usermod -aG docker "$USERNAME"
+
+# ===== Restringe pasta home =====
+chmod 700 /home/"$USERNAME"
+
+echo "Usuário $USERNAME criado com sucesso."

@@ -66,6 +66,7 @@ def create_user(full_name: str, registration: str) -> dict:
     linux_users.create_user(username, full_name)
 
     try:
+        linux_users.restrict_home_directory(username)
         linux_users.set_password_via_chpasswd(username, registration)
         linux_users.expire_password(username)
 
