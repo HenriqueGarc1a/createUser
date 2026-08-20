@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Ubuntu User Manager
+Comment=Criar e administrar usuários locais
+Exec=/opt/ubuntu-user-manager/ubuntu-user-manager
+Icon=system-users
+Terminal=false
+Categories=Settings;System;
+StartupNotify=true

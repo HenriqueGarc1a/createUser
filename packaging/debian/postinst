@@ -1,0 +1,38 @@
+#!/bin/sh
+# postinst — fixes permissions/ownership of app-owned files and refreshes
+# desktop caches. This script MUST NEVER create, modify, or otherwise
+# touch any Linux user account, group, or password. Installing/upgrading
+# the application must never affect existing accounts (spec section 40).
+set -e
+
+HELPER_BIN="/usr/lib/ubuntu-user-manager/user-manager-helper"
+WRAPPER_DIR="/usr/lib/ubuntu-user-manager/helpers"
+POLICY_FILE="/usr/share/polkit-1/actions/com.local.usermanager.policy"
+LOG_DIR="/var/log/ubuntu-user-manager"
+
+if [ "$1" = "configure" ]; then
+    chown root:root "$HELPER_BIN" 2>/dev/null || true
+    chmod 0755 "$HELPER_BIN" 2>/dev/null || true
+
+    for wrapper in create-user reset-password delete-user; do
+        chown root:root "$WRAPPER_DIR/$wrapper" 2>/dev/null || true
+        chmod 0755 "$WRAPPER_DIR/$wrapper" 2>/dev/null || true
+    done
+
+    chown root:root "$POLICY_FILE" 2>/dev/null || true
+    chmod 0644 "$POLICY_FILE" 2>/dev/null || true
+
+    mkdir -p "$LOG_DIR"
+    chown root:root "$LOG_DIR"
+    chmod 0755 "$LOG_DIR"
+
+    if command -v update-desktop-database >/dev/null 2>&1; then
+        update-desktop-database -q /usr/share/applications || true
+    fi
+
+    if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+        gtk-update-icon-cache -q /usr/share/icons/hicolor 2>/dev/null || true
+    fi
+fi
+
+exit 0

@@ -1,0 +1,6 @@
+#!/bin/sh
+# prerm — intentionally a no-op. Removing or upgrading the package must
+# never delete users, homes, change passwords, or lock accounts
+# (spec section 41). Do not add account/home/group logic here.
+set -e
+exit 0

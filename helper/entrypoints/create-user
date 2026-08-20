@@ -1,0 +1,4 @@
+#!/bin/sh
+# Polkit action com.local.usermanager.create maps its exec.path here.
+# The operation name is a fixed literal, never taken from argv/input.
+exec /usr/lib/ubuntu-user-manager/user-manager-helper create-user

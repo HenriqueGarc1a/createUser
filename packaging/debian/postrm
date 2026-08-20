@@ -1,0 +1,14 @@
+#!/bin/sh
+# postrm — on purge, may remove app-owned artifacts that are NOT user
+# accounts/homes/groups (e.g. this package's own log directory). Do not
+# add any code here that touches accounts, homes, groups, or passwords
+# (spec section 41) — that invariant must hold on every code path below.
+set -e
+
+LOG_DIR="/var/log/ubuntu-user-manager"
+
+if [ "$1" = "purge" ]; then
+    rm -rf "$LOG_DIR"
+fi
+
+exit 0

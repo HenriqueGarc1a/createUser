@@ -1,0 +1,14 @@
+Package: ubuntu-user-manager
+Version: __VERSION__
+Section: admin
+Priority: optional
+Architecture: amd64
+Depends: policykit-1, passwd, libgtk-4-1, libadwaita-1-0, gir1.2-gtk-4.0, gir1.2-adw-1, gir1.2-glib-2.0
+Maintainer: Ubuntu User Manager <noreply@local>
+Description: Simple GUI for creating and administering local Ubuntu users
+ Ubuntu User Manager is a GTK4/Libadwaita desktop application for
+ creating, resetting the password of, and deleting local user accounts
+ on lab machines, without requiring the operator to use a terminal.
+ Administrative operations are authorized through Polkit and performed
+ by a separate privileged helper; the graphical interface itself never
+ runs as root.
